@@ -7,7 +7,7 @@ import (
 	"log"
 )
 
-const pluginRateLimiterListRowCount = 10000
+const pluginRateLimiterListRowCount = 500
 
 func rateLimiterTable() *plugin.Table {
 	return &plugin.Table{
@@ -15,6 +15,18 @@ func rateLimiterTable() *plugin.Table {
 		Description: "Table which uses the plugin-scoped rate limiter",
 		List: &plugin.ListConfig{
 			Hydrate: pluginRateLimiterList,
+			KeyColumns: plugin.KeyColumnSlice{
+				{
+					Name:      "region",
+					Operators: []string{"="},
+					Require:   plugin.Optional,
+				},
+				{
+					Name:      "qual",
+					Operators: []string{"="},
+					Require:   plugin.Optional,
+				},
+			},
 		},
 		HydrateConfig: []plugin.HydrateConfig{
 			{
@@ -36,13 +48,26 @@ func rateLimiterTable() *plugin.Table {
 		},
 		Columns: []*plugin.Column{
 			{Name: "id", Type: proto.ColumnType_INT},
+			{Name: "region", Type: proto.ColumnType_STRING},
+			{Name: "qual", Type: proto.ColumnType_STRING},
+
 			{Name: "rate_4", Type: proto.ColumnType_INT, Hydrate: rate4Hydrate},
 			{Name: "rate_3", Type: proto.ColumnType_INT, Hydrate: rate3Hydrate},
 			{Name: "rate_2", Type: proto.ColumnType_INT, Hydrate: rate2Hydrate},
 			{Name: "rate_1", Type: proto.ColumnType_INT, Hydrate: rate1Hydrate},
 		},
+		GetMatrixItemFunc: getRegions,
 	}
+}
 
+func getRegions(context.Context, *plugin.QueryData) []map[string]interface{} {
+	return []map[string]interface{}{
+		{
+			"region": "us-east-1",
+		}, {
+			"region": "us-east-2",
+		},
+	}
 }
 
 func rate4Hydrate(context.Context, *plugin.QueryData, *plugin.HydrateData) (interface{}, error) {
@@ -63,7 +88,16 @@ func rate1Hydrate(context.Context, *plugin.QueryData, *plugin.HydrateData) (inte
 
 func pluginRateLimiterList(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (interface{}, error) {
 	for i := 0; i < pluginRateLimiterListRowCount; i++ {
-		d.StreamListItem(ctx, populateItem(i, d.Table))
+		item := populateItem(i, d.Table)
+
+		if region, ok := d.EqualsQuals["region"]; ok {
+			item["region"] = region.GetStringValue()
+		}
+		if qual, ok := d.EqualsQuals["qual"]; ok && item["qual"] != qual.GetStringValue() {
+			continue
+		}
+
+		d.StreamListItem(ctx, item)
 		if d.RowsRemaining(ctx) == 0 {
 			log.Printf("[WARN] HIT LIMIT, EXITING")
 			break
