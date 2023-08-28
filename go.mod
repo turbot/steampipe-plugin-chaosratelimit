@@ -4,8 +4,6 @@ go 1.19
 
 replace github.com/turbot/steampipe-plugin-sdk/v5 => /Users/kai/Dev/github/turbot/steampipe-plugin-sdk
 
-replace github.com/hashicorp/go-plugin => github.com/binaek/go-plugin v1.14.10-steampipe.0
-
 require github.com/turbot/steampipe-plugin-sdk/v5 v5.0.0-00010101000000-000000000000
 
 require (
