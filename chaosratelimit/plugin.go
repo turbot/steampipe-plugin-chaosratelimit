@@ -2,9 +2,8 @@ package chaosratelimit
 
 import (
 	"context"
-	"github.com/turbot/steampipe-plugin-sdk/v5/rate_limiter"
-
 	"github.com/turbot/steampipe-plugin-sdk/v5/plugin"
+	"github.com/turbot/steampipe-plugin-sdk/v5/rate_limiter"
 )
 
 const (
@@ -14,6 +13,7 @@ const (
 )
 
 func Plugin(_ context.Context) *plugin.Plugin {
+	//time.Sleep(10 * time.Second)
 	p := &plugin.Plugin{
 		Name: pluginName,
 		TableMap: map[string]*plugin.Table{
@@ -24,32 +24,13 @@ func Plugin(_ context.Context) *plugin.Plugin {
 			Schema:      ConfigSchema,
 		},
 		RateLimiters: []*rate_limiter.Definition{
-			//{
-			//	Name:       "unscoped limiter - 1 per second",
-			//	FillRate:   1,
-			//	BucketSize: 1,
-			//},
-			//{
-			//	Name:       "connection scoped limiter (implicit scope)",
-			//	FillRate:   10,
-			//	BucketSize: 10,
-			//	Scopes:     []string{"region", "connection", "hydrate"},
-			//	Where:      "hydrate = 'DescribeBucket'",
-			//},
-			//{
-			//	Name:       "limiter_rate scoped limiter, 10/s",
-			//	FillRate:   10,
-			//	BucketSize: 1,
-			//	Scopes:     []string{"limiter_rate"},
-			//	Where:      "limiter_rate = '4'",
-			//},
-			//{
-			//	Name:       "limiter_rate scoped limiter, 5/s",
-			//	FillRate:   5,
-			//	BucketSize: 1,
-			//	Scopes:     []string{"limiter_rate"},
-			//	Where:      "limiter_rate = '3",
-			//},
+			{
+				Name:       "limiter1",
+				FillRate:   5,
+				BucketSize: 1,
+				Scope:      []string{"limiter_rate"},
+				Where:      "limiter_rate = '3'",
+			},
 			//{
 			//	Name:       "limiter_rate scoped limiter, 2/s",
 			//	FillRate:   2,
@@ -78,6 +59,10 @@ func Plugin(_ context.Context) *plugin.Plugin {
 			//},
 		},
 	}
+	//var a map[string]*plugin.Plugin
+	//
+	//a["foo"] = p
+	//return
 
 	return p
 }

@@ -12,7 +12,7 @@ const pluginRateLimiterListRowCount = 500
 func rateLimiterTable() *plugin.Table {
 	return &plugin.Table{
 		Name:        "chaosratelimit_rate_limiter",
-		Description: "Table which uses the plugin-scoped rate limiter",
+		Description: "Table which uses the plugin-scoped rate limiter_",
 		List: &plugin.ListConfig{
 			Hydrate: pluginRateLimiterList,
 			KeyColumns: plugin.KeyColumnSlice{
@@ -30,20 +30,17 @@ func rateLimiterTable() *plugin.Table {
 		},
 		HydrateConfig: []plugin.HydrateConfig{
 			{
-				Func:        rate4Hydrate,
-				ScopeValues: map[string]string{"limiter_rate": "4"},
+				Func: rate4Hydrate,
 			},
 			{
-				Func:        rate3Hydrate,
-				ScopeValues: map[string]string{"limiter_rate": "3"},
+				Func: rate3Hydrate,
 			},
 			{
-				Func:        rate2Hydrate,
-				ScopeValues: map[string]string{"limiter_rate": "2"},
+				Func: rate2Hydrate,
 			},
 			{
-				Func:        rate1Hydrate,
-				ScopeValues: map[string]string{"limiter_rate": "1"},
+				Func: GetTopicAttributes,
+				Tags: map[string]string{"service": "sns", "action": "GetTopicAttributes"},
 			},
 		},
 		Columns: []*plugin.Column{
@@ -54,7 +51,7 @@ func rateLimiterTable() *plugin.Table {
 			{Name: "rate_4", Type: proto.ColumnType_INT, Hydrate: rate4Hydrate},
 			{Name: "rate_3", Type: proto.ColumnType_INT, Hydrate: rate3Hydrate},
 			{Name: "rate_2", Type: proto.ColumnType_INT, Hydrate: rate2Hydrate},
-			{Name: "rate_1", Type: proto.ColumnType_INT, Hydrate: rate1Hydrate},
+			{Name: "rate_1", Type: proto.ColumnType_INT, Hydrate: GetTopicAttributes},
 		},
 		GetMatrixItemFunc: getRegions,
 	}
@@ -64,8 +61,6 @@ func getRegions(context.Context, *plugin.QueryData) []map[string]interface{} {
 	return []map[string]interface{}{
 		{
 			"region": "us-east-1",
-		}, {
-			"region": "us-east-2",
 		},
 	}
 }
@@ -81,7 +76,7 @@ func rate2Hydrate(context.Context, *plugin.QueryData, *plugin.HydrateData) (inte
 	return map[string]string{"rate_2": "2"}, nil
 
 }
-func rate1Hydrate(context.Context, *plugin.QueryData, *plugin.HydrateData) (interface{}, error) {
+func GetTopicAttributes(context.Context, *plugin.QueryData, *plugin.HydrateData) (interface{}, error) {
 	return map[string]string{"rate_1": "1"}, nil
 
 }

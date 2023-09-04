@@ -24,12 +24,12 @@ func parentChildTable() *plugin.Table {
 		List: &plugin.ListConfig{
 			Hydrate:       listChildHydrateTable,
 			ParentHydrate: listParentHydrateTable,
-			ScopeValues:   map[string]string{"limiter_rate": "4"},
+			Tags:          map[string]string{"limiter_rate": "4"},
 		},
 		Get: &plugin.GetConfig{
-			KeyColumns:  plugin.SingleColumn("Id"),
-			Hydrate:     getTable,
-			ScopeValues: map[string]string{"limiter_rate": "1"},
+			KeyColumns: plugin.SingleColumn("Id"),
+			Hydrate:    getTable,
+			Tags:       map[string]string{"limiter_rate": "1"},
 		},
 		Columns: []*plugin.Column{
 			{Name: "Id", Type: proto.ColumnType_INT, Description: "Column for the ID"},
