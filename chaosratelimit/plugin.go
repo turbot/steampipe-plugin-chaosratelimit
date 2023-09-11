@@ -26,10 +26,9 @@ func Plugin(_ context.Context) *plugin.Plugin {
 		RateLimiters: []*rate_limiter.Definition{
 			{
 				Name:       "limiter1",
-				FillRate:   5,
-				BucketSize: 1,
+				FillRate:   50,
+				BucketSize: 10,
 				Scope:      []string{"limiter_rate"},
-				Where:      "limiter_rate = '3'",
 			},
 			//{
 			//	Name:       "limiter_rate scoped limiter, 2/s",
