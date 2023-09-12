@@ -33,7 +33,7 @@ func rateLimiterTable() *plugin.Table {
 				Func: rate4Hydrate,
 			},
 			{
-				Func: rate3Hydrate,
+				Func: rate3HydrateCached,
 			},
 			{
 				Func: rate2Hydrate,
@@ -49,7 +49,7 @@ func rateLimiterTable() *plugin.Table {
 			{Name: "qual", Type: proto.ColumnType_STRING},
 
 			{Name: "rate_4", Type: proto.ColumnType_INT, Hydrate: rate4Hydrate},
-			{Name: "rate_3", Type: proto.ColumnType_INT, Hydrate: rate3Hydrate},
+			{Name: "rate_3", Type: proto.ColumnType_INT, Hydrate: rate3HydrateCached},
 			{Name: "rate_2", Type: proto.ColumnType_INT, Hydrate: rate2Hydrate},
 			{Name: "rate_1", Type: proto.ColumnType_INT, Hydrate: GetTopicAttributes},
 		},
@@ -64,6 +64,8 @@ func getRegions(context.Context, *plugin.QueryData) []map[string]interface{} {
 		},
 	}
 }
+
+var rate3HydrateCached = (plugin.HydrateFunc(rate3Hydrate)).Memoize()
 
 func rate4Hydrate(context.Context, *plugin.QueryData, *plugin.HydrateData) (interface{}, error) {
 	return map[string]string{"rate_4": "4"}, nil
