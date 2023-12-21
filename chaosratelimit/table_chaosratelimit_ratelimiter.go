@@ -5,10 +5,9 @@ import (
 	"github.com/turbot/steampipe-plugin-sdk/v5/grpc/proto"
 	"github.com/turbot/steampipe-plugin-sdk/v5/plugin"
 	"log"
-	"time"
 )
 
-const pluginRateLimiterListRowCount = 5000
+const pluginRateLimiterListRowCount = 500
 
 func rateLimiterTable() *plugin.Table {
 	return &plugin.Table{
@@ -86,7 +85,6 @@ func GetTopicAttributes(context.Context, *plugin.QueryData, *plugin.HydrateData)
 
 func pluginRateLimiterList(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (interface{}, error) {
 	for i := 0; i < pluginRateLimiterListRowCount; i++ {
-		time.Sleep(10 * time.Millisecond)
 		item := populateItem(i, d.Table)
 
 		if region, ok := d.EqualsQuals["region"]; ok {
