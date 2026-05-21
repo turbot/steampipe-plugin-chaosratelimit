@@ -1,8 +1,8 @@
 package chaosratelimit
 
 import (
-	"github.com/turbot/steampipe-plugin-sdk/v5/plugin"
-	"github.com/turbot/steampipe-plugin-sdk/v5/plugin/schema"
+	"github.com/turbot/steampipe-plugin-sdk/v6/plugin"
+	"github.com/turbot/steampipe-plugin-sdk/v6/plugin/schema"
 )
 
 type chaosratelimiterConfig struct {
@@ -22,9 +22,13 @@ func ConfigInstance() interface{} {
 
 // GetConfig :: retrieve and cast connection config from query data
 func GetConfig(connection *plugin.Connection) chaosratelimiterConfig {
-	if connection == nil || connection.Config == nil {
+	if connection == nil {
 		return chaosratelimiterConfig{}
 	}
-	config, _ := connection.Config.(chaosratelimiterConfig)
+	raw := connection.GetConfig()
+	if raw == nil {
+		return chaosratelimiterConfig{}
+	}
+	config, _ := raw.(chaosratelimiterConfig)
 	return config
 }
